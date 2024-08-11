@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading Game</title>
+    <style>
+        body { background-color: black; color: white; font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
+        button { background-color: cyan; color: black; border: none; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Trading Game</h1>
+        <h2>Balance: ₹<span id="balance">{{ balance }}</span></h2>
+        <h2>Stocks:</h2>
+        <ul id="stocks">
+            {% for company, shares in stocks.items() %}
+                <li>{{ company }}: {{ shares }} shares</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Current Stock Prices</h3>
+        <ul>
+            {% for company, price in companies.items() %}
+                <li>{{ company }}: ₹{{ price }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Buy Stock</h3>
+        <form id="buy-form">
+            <input type="text" name="company" placeholder="Company Name" required>
+            <input type="number" name="shares" placeholder="Number of Shares" required>
+            <button type="submit">Buy</button>
+        </form>
+
+        <h3>Sell Stock</h3>
+        <form id="sell-form">
+            <input type="text" name="company" placeholder="Company Name" required>
+            <input type="number" name="shares" placeholder="Number of Shares" required>
+            <button type="submit">Sell</button>
+        </form>
+
+        <h3>Actions</h3>
+        <button id="update-prices">Update Stock Prices</button>
+    </div>
+
+    <script>
+        document.getElementById('buy-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            fetch('/buy', { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('balance').innerText = data.balance;
+                    // Update stocks list
+                });
+        });
+
+        document.getElementById('sell-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            fetch('/sell', { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('balance').innerText = data.balance;
+                    // Update stocks list
+                });
+        });
+
+        document.getElementById('update-prices').addEventListener('click', function () {
+            fetch('/update_prices', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Stock prices updated!');
+                    // Update stock prices on page
+                });
+        });
+    </script>
+</body>
+</html>
